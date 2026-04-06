@@ -1,292 +1,344 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Holiday Planner — Connecting™</title>
 <style>
-  :root {
-    --bg: #f5f5f7;
-    --card: #ffffff;
-    --border: #e0e0e5;
-    --text: #1d1d1f;
-    --sub: #6e6e73;
-    --blue: #0071e3;
-    --blue-light: #e8f1fc;
-    --l1: #34c759; --l1bg: #f0faf3;
-    --l2: #ff9500; --l2bg: #fff7ec;
-    --l3: #ff3b30; --l3bg: #fff2f1;
-    --radius: 16px;
-    --shadow: 0 2px 20px rgba(0,0,0,.08);
-    --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
-  }
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; }
+:root {
+  --bg: #f2f2f7;
+  --card: #ffffff;
+  --card2: #fafafa;
+  --border: #e5e5ea;
+  --text: #1c1c1e;
+  --sub: #8e8e93;
+  --blue: #007aff;
+  --blue-bg: #eff6ff;
+  --l1: #30d158; --l1bg: #f0faf3; --l1dim: #d4f5df;
+  --l2: #ff9f0a; --l2bg: #fff8ee; --l2dim: #fde8c0;
+  --l3: #ff453a; --l3bg: #fff2f1; --l3dim: #fdd4d2;
+  --sidebar-w: 240px;
+  --header-h: 52px;
+  --radius: 14px;
+  --radius-sm: 10px;
+  --shadow-sm: 0 1px 4px rgba(0,0,0,.06), 0 4px 16px rgba(0,0,0,.06);
+  --shadow-md: 0 4px 24px rgba(0,0,0,.10);
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+  --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 15px; }
+body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; -webkit-font-smoothing: antialiased; }
 
-  /* ── HEADER ── */
-  header {
-    background: rgba(255,255,255,.85);
-    backdrop-filter: saturate(180%) blur(20px);
-    -webkit-backdrop-filter: saturate(180%) blur(20px);
-    border-bottom: 1px solid var(--border);
-    position: sticky; top: 0; z-index: 100;
-    padding: 0 24px;
-    display: flex; align-items: center; justify-content: space-between; gap: 16px;
-    height: 56px;
-  }
-  .logo { font-size: 16px; font-weight: 700; letter-spacing: -.3px; display:flex; align-items:center; gap:8px; white-space:nowrap; }
-  .logo span { color: var(--sub); font-weight: 400; font-size:14px; }
-  .filter-pills { display: flex; gap: 6px; }
-  .pill {
-    padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;
-    border: 1.5px solid var(--border); background: var(--card); cursor: pointer;
-    transition: all .15s; color: var(--sub); user-select: none; white-space:nowrap;
-  }
-  .pill.l1.active { border-color: var(--l1); color: var(--l1); background: var(--l1bg); }
-  .pill.l2.active { border-color: var(--l2); color: var(--l2); background: var(--l2bg); }
-  .pill.l3.active { border-color: var(--l3); color: var(--l3); background: var(--l3bg); }
-  .pill:not(.active) { opacity: .45; }
+/* ── HEADER ─────────────────────────────────────────────── */
+header {
+  height: var(--header-h);
+  background: rgba(255,255,255,.9);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; z-index: 200;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 20px; gap: 12px;
+}
+.logo {
+  display: flex; align-items: center; gap: 8px;
+  font-family: var(--font-display); font-size: 15px; font-weight: 700;
+  letter-spacing: -.3px; white-space: nowrap; user-select: none;
+}
+.logo-icon { font-size: 18px; }
+.logo-sub { color: var(--sub); font-weight: 400; font-size: 13px; }
 
-  /* ── LAYOUT ── */
-  .layout { display: grid; grid-template-columns: 230px 1fr; min-height: calc(100vh - 56px); }
+.pills { display: flex; gap: 5px; }
+.pill {
+  padding: 5px 11px; border-radius: 20px; font-size: 12px; font-weight: 600;
+  border: 1.5px solid var(--border); background: var(--card); cursor: pointer;
+  transition: all .15s; color: var(--sub); user-select: none; white-space: nowrap;
+  letter-spacing: -.1px;
+}
+.pill.l1.on { border-color: var(--l1); color: var(--l1); background: var(--l1bg); }
+.pill.l2.on { border-color: var(--l2); color: var(--l2); background: var(--l2bg); }
+.pill.l3.on { border-color: var(--l3); color: var(--l3); background: var(--l3bg); }
+.pill:not(.on) { opacity: .38; }
 
-  /* ── SIDEBAR ── */
-  .sidebar {
-    background: var(--card); border-right: 1px solid var(--border);
-    position: sticky; top: 56px; height: calc(100vh - 56px); overflow-y: auto;
-    padding: 0 0 32px;
-    display: flex; flex-direction: column;
-  }
+/* ── LAYOUT ─────────────────────────────────────────────── */
+.wrap { display: grid; grid-template-columns: var(--sidebar-w) 1fr; min-height: calc(100vh - var(--header-h)); }
 
-  /* Info accordion */
-  .info-accordion { border-bottom: 1px solid var(--border); }
-  .info-toggle {
-    width: 100%; background: none; border: none; cursor: pointer;
-    padding: 14px 16px; display: flex; align-items: center; justify-content: space-between;
-    font-family: var(--font); font-size: 13px; font-weight: 600; color: var(--sub);
-    letter-spacing: .02em; text-align: left; transition: background .12s;
-  }
-  .info-toggle:hover { background: var(--bg); }
-  .info-toggle-left { display: flex; align-items: center; gap: 7px; }
-  .info-chevron { font-size: 11px; transition: transform .2s; color: var(--sub); }
-  .info-chevron.open { transform: rotate(180deg); }
-  .info-body {
-    display: none; padding: 0 14px 14px;
-  }
-  .info-body.open { display: block; }
+/* ── SIDEBAR ────────────────────────────────────────────── */
+.sidebar {
+  background: var(--card);
+  border-right: 1px solid var(--border);
+  position: sticky; top: var(--header-h);
+  height: calc(100vh - var(--header-h));
+  overflow-y: auto; overflow-x: hidden;
+  padding: 8px 0 40px;
+  scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+}
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
 
-  .info-section { margin-bottom: 14px; }
-  .info-section:last-child { margin-bottom: 0; }
-  .info-section-title { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--sub); margin-bottom: 8px; }
+/* Accordion */
+.accordion { border-bottom: 1px solid var(--border); margin-bottom: 4px; }
+.acc-btn {
+  width: 100%; background: none; border: none; cursor: pointer;
+  padding: 11px 16px; display: flex; align-items: center; justify-content: space-between;
+  font-family: var(--font); font-size: 12px; font-weight: 600; color: var(--sub);
+  letter-spacing: .02em; text-align: left; transition: background .1s; gap: 6px;
+}
+.acc-btn:hover { background: var(--bg); }
+.acc-left { display: flex; align-items: center; gap: 6px; }
+.acc-chevron { font-size: 9px; color: var(--sub); transition: transform .2s; flex-shrink: 0; }
+.acc-chevron.open { transform: rotate(180deg); }
+.acc-body { display: none; padding: 2px 14px 14px; }
+.acc-body.open { display: block; }
 
-  .level-mini { display: flex; align-items: flex-start; gap: 9px; margin-bottom: 8px; }
-  .level-mini:last-child { margin-bottom: 0; }
-  .lm-badge {
-    width: 32px; height: 32px; border-radius: 9px; display: flex; flex-direction: column;
-    align-items: center; justify-content: center; flex-shrink: 0; font-size: 14px;
-  }
-  .lm-badge.l3 { background: var(--l3bg); }
-  .lm-badge.l2 { background: var(--l2bg); }
-  .lm-badge.l1 { background: var(--l1bg); }
-  .lm-body { flex: 1; }
-  .lm-name { font-size: 12px; font-weight: 700; margin-bottom: 1px; }
-  .l3 .lm-name { color: var(--l3); } .l2 .lm-name { color: var(--l2); } .l1 .lm-name { color: var(--l1); }
-  .lm-desc { font-size: 11.5px; color: var(--sub); line-height: 1.4; }
+.info-block { margin-bottom: 12px; }
+.info-block:last-child { margin-bottom: 0; }
+.ib-title { font-size: 10px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--sub); margin-bottom: 8px; }
 
-  .how-mini { font-size: 12px; color: var(--sub); line-height: 1.6; }
-  .how-mini li { margin-left: 14px; margin-bottom: 2px; }
+.lv-row { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 7px; }
+.lv-row:last-child { margin-bottom: 0; }
+.lv-pip {
+  width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center;
+  justify-content: center; font-size: 13px; flex-shrink: 0; margin-top: 1px;
+}
+.lv-pip.l3 { background: var(--l3dim); }
+.lv-pip.l2 { background: var(--l2dim); }
+.lv-pip.l1 { background: var(--l1dim); }
+.lv-text { flex: 1; }
+.lv-name { font-size: 11.5px; font-weight: 700; }
+.lv-row.l3 .lv-name { color: var(--l3); }
+.lv-row.l2 .lv-name { color: var(--l2); }
+.lv-row.l1 .lv-name { color: var(--l1); }
+.lv-desc { font-size: 11px; color: var(--sub); line-height: 1.4; margin-top: 1px; }
 
-  /* Country sections */
-  .sidebar-label {
-    font-size: 10px; font-weight: 700; letter-spacing: .08em;
-    text-transform: uppercase; color: var(--sub); padding: 14px 16px 5px;
-  }
-  .country-btn {
-    display: flex; align-items: center; gap: 9px;
-    padding: 8px 12px; border-radius: 10px; cursor: pointer;
-    border: none; background: transparent; width: calc(100% - 16px); margin: 0 8px;
-    text-align: left; font-family: var(--font); font-size: 14px; color: var(--text);
-    transition: background .12s;
-  }
-  .country-btn:hover { background: var(--bg); }
-  .country-btn.active { background: var(--blue-light); color: var(--blue); font-weight: 600; }
-  .country-flag { font-size: 19px; line-height: 1; flex-shrink: 0; }
-  .pin-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--blue); margin-left: auto; flex-shrink: 0; }
+.howto { font-size: 11.5px; color: var(--sub); line-height: 1.6; padding-left: 2px; }
+.howto li { margin-left: 12px; margin-bottom: 1px; }
 
-  /* ── MAIN ── */
-  main { overflow: hidden; }
+/* Sidebar sections */
+.sec-label {
+  font-size: 10px; font-weight: 700; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--sub);
+  padding: 10px 16px 4px; display: flex; align-items: center; gap: 5px;
+}
+.ctry-btn {
+  display: flex; align-items: center; gap: 9px;
+  padding: 7px 10px; border-radius: var(--radius-sm); cursor: pointer;
+  border: none; background: transparent;
+  width: calc(100% - 16px); margin: 1px 8px;
+  text-align: left; font-family: var(--font); font-size: 13.5px; color: var(--text);
+  transition: background .1s; position: relative;
+}
+.ctry-btn:hover { background: var(--bg); }
+.ctry-btn.on {
+  background: var(--blue-bg); color: var(--blue); font-weight: 600;
+}
+.ctry-flag { font-size: 18px; flex-shrink: 0; line-height: 1; }
+.ctry-name { flex: 1; }
+.pin-indicator {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--blue); opacity: .5; flex-shrink: 0;
+}
 
-  /* ── EMPTY STATE ── */
-  #emptyState {
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    min-height: calc(100vh - 56px); text-align: center; padding: 40px;
-    color: var(--sub);
-  }
-  .es-icon { font-size: 52px; margin-bottom: 16px; }
-  .es-title { font-size: 22px; font-weight: 700; color: var(--text); margin-bottom: 8px; letter-spacing: -.3px; }
-  .es-sub { font-size: 15px; line-height: 1.5; max-width: 300px; }
-  .es-arrow { font-size: 28px; margin-top: 24px; animation: arrowLeft 1.4s ease-in-out infinite; }
-  @keyframes arrowLeft { 0%,100%{transform:translateX(0)} 50%{transform:translateX(-8px)} }
+/* ── MAIN ───────────────────────────────────────────────── */
+main { min-height: calc(100vh - var(--header-h)); display: flex; flex-direction: column; }
 
-  /* ── HOLIDAY VIEW ── */
-  #holidayView { padding: 28px 28px 60px; display: none; }
+/* Empty state */
+.empty-state {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center; padding: 40px; color: var(--sub);
+  gap: 10px;
+}
+.es-glyph { font-size: 56px; line-height: 1; margin-bottom: 4px; }
+.es-title { font-family: var(--font-display); font-size: 20px; font-weight: 700; color: var(--text); letter-spacing: -.4px; }
+.es-body { font-size: 14px; color: var(--sub); max-width: 260px; line-height: 1.5; }
+.es-hint { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--sub); margin-top: 8px; }
+.es-hint-arrow { font-size: 18px; animation: nudge 1.6s ease-in-out infinite; }
+@keyframes nudge { 0%,100%{transform:translateX(0)} 50%{transform:translateX(-7px)} }
 
-  .view-header { margin-bottom: 20px; }
-  .view-title { font-size: 26px; font-weight: 700; letter-spacing: -.5px; }
-  .view-sub { font-size: 13px; color: var(--sub); margin-top: 3px; }
+/* Holiday view */
+.hv { padding: 24px 26px 60px; display: none; }
 
-  /* Upcoming */
-  .section-label { font-size: 11px; font-weight: 700; color: var(--sub); letter-spacing: .05em; text-transform: uppercase; margin-bottom: 10px; }
-  .upcoming-strip { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 28px; scrollbar-width: none; }
-  .upcoming-strip::-webkit-scrollbar { display: none; }
-  .upcoming-card {
-    flex: 0 0 auto; border-radius: 14px; border: 1.5px solid var(--border);
-    padding: 13px 15px 11px; min-width: 148px; position: relative; overflow: hidden;
-    background: var(--card); transition: all .15s;
-  }
-  .upcoming-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
-  .upcoming-card.l1 { border-color: var(--l1); background: var(--l1bg); }
-  .upcoming-card.l2 { border-color: var(--l2); background: var(--l2bg); }
-  .upcoming-card.l3 { border-color: var(--l3); background: var(--l3bg); }
-  .uc-emoji { font-size: 20px; position: absolute; top: 11px; right: 11px; }
-  .uc-days { font-size: 10px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; margin-bottom: 4px; }
-  .l1 .uc-days{color:var(--l1);} .l2 .uc-days{color:var(--l2);} .l3 .uc-days{color:var(--l3);}
-  .uc-name { font-size: 13px; font-weight: 600; line-height: 1.2; padding-right: 26px; }
-  .uc-date { font-size: 11px; color: var(--sub); margin-top: 3px; }
+/* View header */
+.vh-header { margin-bottom: 22px; }
+.vh-flag-title { display: flex; align-items: center; gap: 10px; }
+.vh-flag { font-size: 30px; line-height: 1; }
+.vh-title { font-family: var(--font-display); font-size: 24px; font-weight: 700; letter-spacing: -.5px; }
+.vh-meta { font-size: 12px; color: var(--sub); margin-top: 4px; letter-spacing: .01em; }
 
-  /* Month */
-  .month-section { margin-bottom: 30px; }
-  .month-title {
-    font-size: 18px; font-weight: 700; letter-spacing: -.3px;
-    margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--border);
-    display: flex; align-items: center; gap: 8px;
-  }
-  .month-badge { font-size: 11px; font-weight: 600; background: var(--blue-light); color: var(--blue); padding: 2px 9px; border-radius: 20px; }
+/* Upcoming strip */
+.strip-label { font-size: 10.5px; font-weight: 700; color: var(--sub); letter-spacing: .07em; text-transform: uppercase; margin-bottom: 10px; display: flex; align-items: center; gap: 5px; }
+.strip { display: flex; gap: 9px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 28px; scrollbar-width: none; }
+.strip::-webkit-scrollbar { display: none; }
+.strip-card {
+  flex: 0 0 auto; border-radius: var(--radius); border: 1.5px solid transparent;
+  padding: 12px 14px 10px; min-width: 144px; position: relative;
+  transition: transform .15s, box-shadow .15s; cursor: default;
+}
+.strip-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+.strip-card.l1 { background: var(--l1bg); border-color: var(--l1dim); }
+.strip-card.l2 { background: var(--l2bg); border-color: var(--l2dim); }
+.strip-card.l3 { background: var(--l3bg); border-color: var(--l3dim); }
+.sc-emoji { font-size: 19px; position: absolute; top: 10px; right: 10px; }
+.sc-countdown { font-size: 10px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; margin-bottom: 5px; }
+.l1 .sc-countdown { color: var(--l1); }
+.l2 .sc-countdown { color: var(--l2); }
+.l3 .sc-countdown { color: var(--l3); }
+.sc-name { font-size: 13px; font-weight: 600; line-height: 1.25; padding-right: 22px; color: var(--text); }
+.sc-date { font-size: 11px; color: var(--sub); margin-top: 3px; }
 
-  .holiday-list { display: flex; flex-direction: column; gap: 9px; }
-  .holiday-row {
-    background: var(--card); border-radius: var(--radius); padding: 13px 16px;
-    display: flex; align-items: center; gap: 13px;
-    border: 1.5px solid var(--border); transition: all .15s;
-  }
-  .holiday-row:hover { box-shadow: var(--shadow); transform: translateY(-1px); }
-  .holiday-row.l1 { border-left: 4px solid var(--l1); }
-  .holiday-row.l2 { border-left: 4px solid var(--l2); }
-  .holiday-row.l3 { border-left: 4px solid var(--l3); }
-  .hday-date { min-width: 44px; text-align: center; }
-  .hday-day { font-size: 22px; font-weight: 700; line-height: 1; color: var(--blue); }
-  .hday-mon { font-size: 10px; font-weight: 700; color: var(--sub); margin-top: 1px; text-transform: uppercase; }
-  .hday-info { flex: 1; min-width: 0; }
-  .hday-name { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
-  .hday-emoji { font-size: 17px; flex-shrink: 0; }
-  .hday-desc { font-size: 12.5px; color: var(--sub); margin-top: 2px; line-height: 1.4; }
-  .hday-tags { display: flex; gap: 4px; margin-top: 5px; flex-wrap: wrap; }
-  .tag { font-size: 10.5px; font-weight: 500; padding: 2px 7px; border-radius: 6px; background: var(--bg); color: var(--sub); border: 1px solid var(--border); }
-  .level-badge {
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    width: 44px; height: 44px; border-radius: 11px; font-weight: 700; flex-shrink: 0;
-  }
-  .level-badge.l1{background:var(--l1bg);color:var(--l1);}
-  .level-badge.l2{background:var(--l2bg);color:var(--l2);}
-  .level-badge.l3{background:var(--l3bg);color:var(--l3);}
-  .lb-icon{font-size:16px;line-height:1;}
-  .lb-label{font-size:8.5px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;margin-top:1px;}
+/* Month group */
+.month-grp { margin-bottom: 28px; }
+.month-hd {
+  display: flex; align-items: center; gap: 8px;
+  font-family: var(--font-display); font-size: 17px; font-weight: 700;
+  letter-spacing: -.3px; padding-bottom: 10px;
+  border-bottom: 1px solid var(--border); margin-bottom: 11px;
+}
+.m-count { font-size: 11px; font-weight: 600; background: var(--blue-bg); color: var(--blue); padding: 2px 9px; border-radius: 20px; }
 
-  .no-results { text-align: center; padding: 40px 20px; color: var(--sub); }
+.h-list { display: flex; flex-direction: column; gap: 8px; }
+.h-row {
+  background: var(--card); border-radius: var(--radius);
+  border: 1px solid var(--border);
+  border-left: 4px solid transparent;
+  padding: 13px 15px; display: flex; align-items: center; gap: 12px;
+  transition: transform .12s, box-shadow .12s;
+  box-shadow: var(--shadow-sm);
+}
+.h-row:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); }
+.h-row.l1 { border-left-color: var(--l1); }
+.h-row.l2 { border-left-color: var(--l2); }
+.h-row.l3 { border-left-color: var(--l3); }
 
-  @media(max-width:680px) {
-    .layout { grid-template-columns: 1fr; }
-    .sidebar { position: static; height: auto; }
-    #holidayView { padding: 16px; }
-  }
+.h-date {
+  min-width: 46px; text-align: center;
+  padding-right: 12px; border-right: 1px solid var(--border);
+}
+.h-dd { font-family: var(--font-display); font-size: 22px; font-weight: 700; line-height: 1; color: var(--blue); }
+.h-mm { font-size: 10px; font-weight: 700; color: var(--sub); text-transform: uppercase; margin-top: 2px; letter-spacing: .04em; }
+
+.h-body { flex: 1; min-width: 0; }
+.h-name { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 6px; line-height: 1.2; }
+.h-emoji { font-size: 16px; flex-shrink: 0; }
+.h-desc { font-size: 12px; color: var(--sub); margin-top: 3px; line-height: 1.45; }
+.h-tags { display: flex; gap: 4px; margin-top: 6px; flex-wrap: wrap; }
+.htag {
+  font-size: 10.5px; font-weight: 500; padding: 1.5px 7px; border-radius: 6px;
+  background: var(--bg); color: var(--sub); border: 1px solid var(--border);
+}
+
+.h-badge {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  width: 42px; height: 42px; border-radius: 11px; flex-shrink: 0;
+}
+.h-badge.l1 { background: var(--l1bg); color: var(--l1); }
+.h-badge.l2 { background: var(--l2bg); color: var(--l2); }
+.h-badge.l3 { background: var(--l3bg); color: var(--l3); }
+.hb-icon { font-size: 16px; line-height: 1; }
+.hb-lbl { font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; margin-top: 2px; }
+
+.no-results { text-align: center; padding: 48px 20px; color: var(--sub); font-size: 14px; }
+
+/* Today chip */
+.today-chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: var(--l3bg); color: var(--l3); border: 1px solid var(--l3dim);
+  font-size: 10px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
+  padding: 2px 8px; border-radius: 20px; margin-left: 6px; vertical-align: middle;
+}
+
+@media(max-width:640px){
+  .wrap{grid-template-columns:1fr;}
+  .sidebar{display:none;}
+  .hv{padding:16px 14px 40px;}
+}
 </style>
 </head>
 <body>
 
 <header>
-  <div class="logo">🗓️ Holiday Planner <span>/ Connecting™</span></div>
-  <div class="filter-pills" id="levelFilters">
-    <div class="pill l3 active" data-level="3">🔥 Money Printer</div>
-    <div class="pill l2 active" data-level="2">💰 High Potential</div>
-    <div class="pill l1 active" data-level="1">✅ Decent</div>
+  <div class="logo">
+    <span class="logo-icon">🗓️</span>
+    Holiday Planner
+    <span class="logo-sub">/ Connecting™</span>
+  </div>
+  <div class="pills" id="pills">
+    <div class="pill l3 on" data-lv="3">🔥 Money Printer</div>
+    <div class="pill l2 on" data-lv="2">💰 High Potential</div>
+    <div class="pill l1 on" data-lv="1">✅ Decent</div>
   </div>
 </header>
 
-<div class="layout">
+<div class="wrap">
 
-  <!-- ── SIDEBAR ── -->
   <nav class="sidebar">
-
-    <!-- Info Accordion -->
-    <div class="info-accordion">
-      <button class="info-toggle" onclick="toggleInfo()">
-        <span class="info-toggle-left">ℹ️ &nbsp;How it works</span>
-        <span class="info-chevron" id="infoChevron">▼</span>
+    <!-- Accordion -->
+    <div class="accordion">
+      <button class="acc-btn" onclick="toggleAcc()">
+        <span class="acc-left">ℹ️&nbsp; How it works</span>
+        <span class="acc-chevron" id="accChev">▼</span>
       </button>
-      <div class="info-body" id="infoBody">
-
-        <div class="info-section">
-          <div class="info-section-title">What this tool does</div>
-          <ul class="how-mini">
-            <li>Shows only discount-worthy holidays — no solemn or irrelevant days</li>
-            <li>Pick any market to see its full 2026 holiday calendar</li>
-            <li>Upcoming dates (next 90 days) shown at the top</li>
-            <li>Filter by level using the buttons in the header</li>
+      <div class="acc-body" id="accBody">
+        <div class="info-block">
+          <div class="ib-title">Rating System</div>
+          <div class="lv-row l3">
+            <div class="lv-pip l3">🔥</div>
+            <div class="lv-text">
+              <div class="lv-name">Level 3 — Money Printer</div>
+              <div class="lv-desc">Must-run. Max budget. Go all-out. (Black Friday, Valentine's Day, Christmas, Pesach…)</div>
+            </div>
+          </div>
+          <div class="lv-row l2">
+            <div class="lv-pip l2">💰</div>
+            <div class="lv-text">
+              <div class="lv-name">Level 2 — High Potential</div>
+              <div class="lv-desc">Strong campaign, worth investing. (Mother's Day, Halloween, Easter…)</div>
+            </div>
+          </div>
+          <div class="lv-row l1">
+            <div class="lv-pip l1">✅</div>
+            <div class="lv-text">
+              <div class="lv-name">Level 1 — Decent</div>
+              <div class="lv-desc">Easy banner or small promo. (St. Patrick's, Bastille Day…)</div>
+            </div>
+          </div>
+        </div>
+        <div class="info-block">
+          <div class="ib-title">How to use</div>
+          <ul class="howto">
+            <li>Click any market to load its holidays</li>
+            <li>Only future dates shown — no past holidays</li>
+            <li>Next 90 days shown as quick cards at top</li>
+            <li>Filter by level using the header buttons</li>
           </ul>
         </div>
-
-        <div class="info-section">
-          <div class="info-section-title">Rating System</div>
-          <div class="level-mini l3">
-            <div class="lm-badge l3">🔥</div>
-            <div class="lm-body">
-              <div class="lm-name">Level 3 — Money Printer</div>
-              <div class="lm-desc">Must-run. Go all-out. Max budget. Examples: Black Friday, Valentine's Day, Christmas, Pesach, EOFY.</div>
-            </div>
-          </div>
-          <div class="level-mini l2">
-            <div class="lm-badge l2">💰</div>
-            <div class="lm-body">
-              <div class="lm-name">Level 2 — High Potential</div>
-              <div class="lm-desc">Strong opportunity. Worth a real campaign. Examples: Mother's Day, Halloween, Easter.</div>
-            </div>
-          </div>
-          <div class="level-mini l1">
-            <div class="lm-badge l1">✅</div>
-            <div class="lm-body">
-              <div class="lm-name">Level 1 — Decent</div>
-              <div class="lm-desc">Easy win. A banner or small promo. Examples: St. Patrick's Day, Bastille Day.</div>
-            </div>
-          </div>
-        </div>
-
       </div>
     </div>
 
-    <!-- Pinned -->
-    <div class="sidebar-label">📌 Pinned Markets</div>
+    <div class="sec-label">📌 Pinned Markets</div>
     <div id="pinnedList"></div>
-
-    <!-- All -->
-    <div class="sidebar-label" style="margin-top:4px">🌍 All Markets</div>
+    <div class="sec-label" style="margin-top:6px">🌍 All Markets</div>
     <div id="otherList"></div>
-
   </nav>
 
-  <!-- ── MAIN ── -->
   <main>
-    <div id="emptyState">
-      <div class="es-icon">🗓️</div>
-      <div class="es-title">Select a market</div>
-      <div class="es-sub">Choose a country on the left to see its discount-worthy holidays for 2026.</div>
-      <div class="es-arrow">←</div>
+    <div class="empty-state" id="emptyState">
+      <div class="es-glyph">🗓️</div>
+      <div class="es-title">Pick a market</div>
+      <div class="es-body">Select a country to see its upcoming discount opportunities for 2026.</div>
+      <div class="es-hint"><span class="es-hint-arrow">←</span> Choose from the sidebar</div>
     </div>
-    <div id="holidayView">
-      <div class="view-header">
-        <div class="view-title" id="viewTitle"></div>
-        <div class="view-sub" id="viewSub"></div>
+    <div class="hv" id="hv">
+      <div class="vh-header">
+        <div class="vh-flag-title">
+          <span class="vh-flag" id="vhFlag"></span>
+          <span class="vh-title" id="vhTitle"></span>
+        </div>
+        <div class="vh-meta" id="vhMeta"></div>
       </div>
-      <div id="holidayContent"></div>
+      <div id="hvContent"></div>
     </div>
   </main>
 
@@ -308,226 +360,211 @@ const COUNTRIES = [
 ];
 
 const Y = 2026;
-function f(m,d){return new Date(Y,m-1,d);}
+const f = (m,d) => new Date(Y,m-1,d);
 
 const DATES = {
-  ny:        f(1,1),
-  reyes:     f(1,6),
-  auday:     f(1,26),
-  vday:      f(2,14),
-  iwd:       f(3,8),
-  purim:     f(3,3),
-  mothuk:    f(3,15),
-  stpat:     f(3,17),
-  pesach:    f(4,1),
-  easter:    f(4,5),
-  anzac:     f(4,25),
-  mothday:   f(5,10),
-  memday:    f(5,25),
-  fathday:   f(6,21),
-  soldes:    f(6,25),
-  eofy:      f(6,30),
-  july4:     f(7,4),
-  bastille:  f(7,14),
-  bts:       f(8,20),
-  laborday:  f(9,7),
-  rosh:      f(9,20),
-  fathdayau: f(9,6),
-  sukkot:    f(10,14),
-  cathanks:  f(10,12),
-  halloween: f(10,31),
-  singles:   f(11,11),
-  thanks:    f(11,26),
-  bf:        f(11,27),
-  cm:        f(11,30),
-  hanukkah:  f(12,4),
-  xmaseve:   f(12,24),
-  xmas:      f(12,25),
-  nye:       f(12,31),
+  ny:f(1,1), reyes:f(1,6), auday:f(1,26),
+  vday:f(2,14),
+  iwd:f(3,8), purim:f(3,3), mothuk:f(3,15), stpat:f(3,17),
+  pesach:f(4,1), easter:f(4,5), anzac:f(4,25),
+  mothday:f(5,10), memday:f(5,25),
+  fathday:f(6,21), soldes:f(6,25), eofy:f(6,30),
+  july4:f(7,4), bastille:f(7,14),
+  bts:f(8,20),
+  laborday:f(9,7), rosh:f(9,20), fathdayau:f(9,6),
+  sukkot:f(10,14), cathanks:f(10,12), halloween:f(10,31),
+  singles:f(11,11), thanks:f(11,26), bf:f(11,27), cm:f(11,30),
+  hanukkah:f(12,4), xmaseve:f(12,24), xmas:f(12,25), nye:f(12,31),
 };
 
 const HOLIDAYS = [
-  {id:'ny',      name:"New Year's Day",           emoji:'🎆',countries:['us','gb','fr','au','nz','ca','de','it','es'],          level:2,tags:['New Year','Sale'],     desc:"Fresh-start energy. January sales and new-year messaging work well."},
-  {id:'reyes',   name:"Día de Reyes (Kings' Day)", emoji:'👑',countries:['es','it'],                                            level:3,tags:['Gift','Top'],          desc:"Bigger than Christmas in Spain & Italy. The year's single biggest gift-buying moment."},
-  {id:'auday',   name:"Australia Day",             emoji:'🦘',countries:['au'],                                                 level:2,tags:['National','AU'],       desc:"Patriotic celebration. Couples and gifting campaigns perform well."},
-  {id:'vday',    name:"Valentine's Day",           emoji:'❤️', countries:['us','gb','fr','au','nz','ca','de','it','es','il'],   level:3,tags:['Couples','Gift','Top'], desc:"#1 holiday for Connecting™. Couples gift-buying at absolute peak worldwide."},
-  {id:'iwd',     name:"International Women's Day", emoji:'🌸',countries:['us','gb','fr','au','nz','ca','de','it','es','il'],    level:2,tags:['Gift','Partner'],      desc:"Great for couple gifting and relationship-forward messaging."},
-  {id:'purim',   name:"Purim",                     emoji:'🎭',countries:['il'],                                                 level:2,tags:['IL','Fun'],            desc:"Fun, celebratory Israeli holiday. Playful couple promotions work well."},
-  {id:'mothuk',  name:"Mother's Day (UK)",          emoji:'🌹',countries:['gb'],                                                level:2,tags:['Gift','UK'],           desc:"UK Mothering Sunday — falls in March, earlier than US/AU. Big gifting moment."},
-  {id:'stpat',   name:"St. Patrick's Day",          emoji:'🍀',countries:['us','gb','ca'],                                      level:1,tags:['Fun','Sale'],          desc:"Playful couple-themed promotions with a fun, lighthearted angle."},
-  {id:'pesach',  name:"Passover / Pesach",          emoji:'✡️', countries:['il'],                                               level:3,tags:['IL','Top','Family'],   desc:"Biggest IL family holiday. Connection and gifting themes are perfectly timed."},
-  {id:'easter',  name:"Easter",                     emoji:'🐣',countries:['us','gb','fr','au','nz','ca','de','it','es'],        level:2,tags:['Spring','Gift'],       desc:"Spring gifting — couples and family. Good for bundle promotions."},
-  {id:'anzac',   name:"ANZAC Day",                  emoji:'🌺',countries:['au','nz'],                                           level:1,tags:['National','AU','NZ'],  desc:"Respectful tone required. Subtle promotions with a patriotic angle can work."},
-  {id:'mothday', name:"Mother's Day",               emoji:'🌷',countries:['us','au','nz','ca','de','it','es','il'],             level:3,tags:['Gift','Top'],          desc:"Top gift holiday globally. One of the strongest for Connecting™ gifting campaigns."},
-  {id:'memday',  name:"Memorial Day Sale",          emoji:'🇺🇸',countries:['us'],                                               level:2,tags:['Sale','US'],           desc:"Major US long-weekend sale event. Customers actively looking for deals."},
-  {id:'fathday', name:"Father's Day",               emoji:'👔',countries:['us','ca','gb','de','it','es','il'],                  level:2,tags:['Gift','Dad'],          desc:"Father's Day gifting — strong for Connecting™ gifting campaigns to partners."},
-  {id:'soldes',  name:"Summer Sales / Soldes (EU)", emoji:'☀️',countries:['fr','de','it','es'],                                 level:2,tags:['Sale','EU','Summer'],  desc:"Official EU summer sales season. Customers actively looking for discounts."},
-  {id:'eofy',    name:"EOFY Sale",                  emoji:'📊',countries:['au'],                                                level:3,tags:['Sale','AU','Top'],     desc:"Australia's biggest sale event outside Black Friday. All-out promotion."},
-  {id:'july4',   name:"4th of July",                emoji:'🎇',countries:['us'],                                                level:2,tags:['US','Sale'],           desc:"Patriotic US summer holiday. Strong sale culture, couples celebrations."},
-  {id:'bastille',name:"Bastille Day",               emoji:'🇫🇷',countries:['fr'],                                               level:1,tags:['FR','National'],       desc:"French national day. Subtle, well-timed promotions resonate."},
-  {id:'bts',     name:"Back to School Season",      emoji:'🎒',countries:['us','fr','gb','de','it','es','ca'],                  level:1,tags:['Season','Sale'],       desc:"End of summer push. 'Back to us' couple gifting angle works well."},
-  {id:'laborday',name:"Labor Day Sale",             emoji:'🛍️',countries:['us','ca'],                                           level:2,tags:['Sale','US','CA'],      desc:"Major US/CA long weekend — strong sale event with deal-seeking traffic."},
-  {id:'rosh',    name:"Rosh Hashana",               emoji:'🍎',countries:['il'],                                                level:3,tags:['IL','Top','Family'],   desc:"Jewish New Year — Israel's highest gifting and couples moment alongside Pesach."},
-  {id:'fathdayau',name:"Father's Day (AU/NZ)",      emoji:'👔',countries:['au','nz'],                                           level:2,tags:['Gift','Dad','AU'],     desc:"AU/NZ Father's Day in September. Same gifting power as June for other markets."},
-  {id:'sukkot',  name:"Sukkot",                     emoji:'🌿',countries:['il'],                                                level:1,tags:['IL','Family'],         desc:"Israeli harvest holiday — decent window for couple-focused promotions."},
-  {id:'cathanks',name:"Canadian Thanksgiving",      emoji:'🍁',countries:['ca'],                                                level:2,tags:['CA','Gift','Family'],  desc:"Major CA gifting and family celebration. Good for couples content."},
-  {id:'halloween',name:"Halloween",                 emoji:'🎃',countries:['us','gb','ca','au','nz'],                            level:2,tags:['Fun','Sale'],          desc:"Playful couple-themed content works brilliantly. Growing strongly in AU/NZ."},
-  {id:'singles', name:"Singles Day (11.11)",        emoji:'💔',countries:['us','gb','fr','de','it','es'],                       level:2,tags:['Sale','Singles'],      desc:"Growing globally. Playful couples-vs-singles angle is a natural fit for Connecting™."},
-  {id:'thanks',  name:"Thanksgiving",               emoji:'🦃',countries:['us'],                                                level:2,tags:['US','Gift','Family'],  desc:"Pre-Black Friday US gifting window. Family and couple gifting moment."},
-  {id:'bf',      name:"Black Friday",               emoji:'🛒',countries:['us','gb','fr','au','nz','ca','de','it','es','il'],   level:3,tags:['Sale','Top','BF'],     desc:"The biggest global sale event of the year. Maximum promotion in every market."},
-  {id:'cm',      name:"Cyber Monday",               emoji:'💻',countries:['us','gb','fr','au','nz','ca','de','it','es','il'],   level:3,tags:['Sale','Top','BF'],     desc:"Follows Black Friday. Strongest digital sales moment globally. Go all-out."},
-  {id:'hanukkah',name:"Hanukkah",                   emoji:'🕎',countries:['il','us'],                                           level:2,tags:['IL','Gift'],           desc:"Hanukkah gifting — couple and family campaigns work well in IL + US Jewish market."},
-  {id:'xmaseve', name:"Christmas Eve",              emoji:'🎁',countries:['us','gb','fr','au','nz','ca','de','it','es'],        level:2,tags:['Gift','Xmas'],         desc:"Last-minute gifting rush. Digital and fast-delivery products especially strong."},
-  {id:'xmas',    name:"Christmas",                  emoji:'🎄',countries:['us','gb','fr','au','nz','ca','de','it','es'],        level:3,tags:['Gift','Top','Xmas'],   desc:"Biggest gift-buying moment of the year. All-out promotion for every market."},
-  {id:'nye',     name:"New Year's Eve Sale",        emoji:'🥂',countries:['us','gb','fr','au','nz','ca','de','it','es','il'],   level:2,tags:['Sale','NYE'],          desc:"Couples celebration night — last-minute gift and experience promotions."},
+  {id:'ny',      name:"New Year's Day",           emoji:'🎆',countries:['us','gb','fr','au','nz','ca','de','it','es'],          level:2,tags:['New Year','Sale'],    desc:"Fresh-start energy. January sales and new-year messaging work well."},
+  {id:'reyes',   name:"Día de Reyes (Kings' Day)", emoji:'👑',countries:['es','it'],                                            level:3,tags:['Gift','Top'],         desc:"Bigger than Christmas in Spain & Italy. Year's single biggest gift-buying moment."},
+  {id:'auday',   name:"Australia Day",             emoji:'🦘',countries:['au'],                                                 level:2,tags:['National','AU'],      desc:"Patriotic celebration. Couples and gifting campaigns perform well."},
+  {id:'vday',    name:"Valentine's Day",           emoji:'❤️', countries:['us','gb','fr','au','nz','ca','de','it','es','il'],   level:3,tags:['Couples','Gift','Top'],desc:"#1 holiday for Connecting™. Couples gift-buying at absolute peak worldwide."},
+  {id:'iwd',     name:"International Women's Day", emoji:'🌸',countries:['us','gb','fr','au','nz','ca','de','it','es','il'],    level:2,tags:['Gift','Partner'],     desc:"Great for couple gifting and relationship-forward messaging."},
+  {id:'purim',   name:"Purim",                     emoji:'🎭',countries:['il'],                                                 level:2,tags:['IL','Fun'],           desc:"Fun, celebratory Israeli holiday. Playful couple promotions work well."},
+  {id:'mothuk',  name:"Mother's Day (UK)",          emoji:'🌹',countries:['gb'],                                                level:2,tags:['Gift','UK'],          desc:"UK Mothering Sunday — falls in March, earlier than US/AU. Big gifting moment."},
+  {id:'stpat',   name:"St. Patrick's Day",          emoji:'🍀',countries:['us','gb','ca'],                                      level:1,tags:['Fun','Sale'],         desc:"Playful couple-themed promotions with a fun, lighthearted angle."},
+  {id:'pesach',  name:"Passover / Pesach",          emoji:'✡️', countries:['il'],                                               level:3,tags:['IL','Top','Family'],  desc:"Biggest IL family holiday. Connection and gifting themes are perfectly timed."},
+  {id:'easter',  name:"Easter",                     emoji:'🐣',countries:['us','gb','fr','au','nz','ca','de','it','es'],        level:2,tags:['Spring','Gift'],      desc:"Spring gifting — couples and family. Good for bundle promotions."},
+  {id:'anzac',   name:"ANZAC Day",                  emoji:'🌺',countries:['au','nz'],                                           level:1,tags:['National','AU','NZ'], desc:"Respectful tone required. Subtle promotions with a patriotic angle can work."},
+  {id:'mothday', name:"Mother's Day",               emoji:'🌷',countries:['us','au','nz','ca','de','it','es','il'],             level:3,tags:['Gift','Top'],         desc:"Top gift holiday globally. One of the strongest for Connecting™ gifting campaigns."},
+  {id:'memday',  name:"Memorial Day Sale",          emoji:'🇺🇸',countries:['us'],                                               level:2,tags:['Sale','US'],          desc:"Major US long-weekend sale event. Customers actively looking for deals."},
+  {id:'fathday', name:"Father's Day",               emoji:'👔',countries:['us','ca','gb','de','it','es','il'],                  level:2,tags:['Gift','Dad'],         desc:"Father's Day gifting — strong for Connecting™ partner-gifting campaigns."},
+  {id:'soldes',  name:"Summer Sales / Soldes (EU)", emoji:'☀️',countries:['fr','de','it','es'],                                 level:2,tags:['Sale','EU','Summer'], desc:"Official EU summer sales season. Customers actively looking for discounts."},
+  {id:'eofy',    name:"EOFY Sale",                  emoji:'📊',countries:['au'],                                                level:3,tags:['Sale','AU','Top'],    desc:"Australia's biggest sale event outside Black Friday. All-out promotion."},
+  {id:'july4',   name:"4th of July",                emoji:'🎇',countries:['us'],                                                level:2,tags:['US','Sale'],          desc:"Patriotic US summer holiday. Strong sale culture, couples celebrations."},
+  {id:'bastille',name:"Bastille Day",               emoji:'🇫🇷',countries:['fr'],                                               level:1,tags:['FR','National'],      desc:"French national day. Subtle, well-timed promotions resonate."},
+  {id:'bts',     name:"Back to School Season",      emoji:'🎒',countries:['us','fr','gb','de','it','es','ca'],                  level:1,tags:['Season','Sale'],      desc:"End of summer push. 'Back to us' couple gifting angle works well."},
+  {id:'laborday',name:"Labor Day Sale",             emoji:'🛍️',countries:['us','ca'],                                           level:2,tags:['Sale','US','CA'],     desc:"Major US/CA long weekend — strong sale event with deal-seeking traffic."},
+  {id:'rosh',    name:"Rosh Hashana",               emoji:'🍎',countries:['il'],                                                level:3,tags:['IL','Top','Family'],  desc:"Jewish New Year — Israel's highest gifting and couples moment alongside Pesach."},
+  {id:'fathdayau',name:"Father's Day (AU/NZ)",      emoji:'👔',countries:['au','nz'],                                           level:2,tags:['Gift','Dad','AU'],    desc:"AU/NZ Father's Day in September. Same gifting power as June for other markets."},
+  {id:'sukkot',  name:"Sukkot",                     emoji:'🌿',countries:['il'],                                                level:1,tags:['IL','Family'],        desc:"Israeli harvest holiday — decent window for couple-focused promotions."},
+  {id:'cathanks',name:"Canadian Thanksgiving",      emoji:'🍁',countries:['ca'],                                                level:2,tags:['CA','Gift','Family'], desc:"Major CA gifting and family celebration. Good for couples content."},
+  {id:'halloween',name:"Halloween",                 emoji:'🎃',countries:['us','gb','ca','au','nz'],                            level:2,tags:['Fun','Sale'],         desc:"Playful couple-themed content works brilliantly. Growing strongly in AU/NZ."},
+  {id:'singles', name:"Singles Day (11.11)",        emoji:'💔',countries:['us','gb','fr','de','it','es'],                       level:2,tags:['Sale','Singles'],     desc:"Growing globally. Couples-vs-singles angle is a natural fit for Connecting™."},
+  {id:'thanks',  name:"Thanksgiving",               emoji:'🦃',countries:['us'],                                                level:2,tags:['US','Gift','Family'], desc:"Pre-Black Friday US gifting window. Family and couple gifting moment."},
+  {id:'bf',      name:"Black Friday",               emoji:'🛒',countries:['us','gb','fr','au','nz','ca','de','it','es','il'],   level:3,tags:['Sale','Top','BF'],    desc:"The biggest global sale event of the year. Maximum promotion in every market."},
+  {id:'cm',      name:"Cyber Monday",               emoji:'💻',countries:['us','gb','fr','au','nz','ca','de','it','es','il'],   level:3,tags:['Sale','Top','BF'],    desc:"Follows Black Friday. Strongest digital sales moment globally. Go all-out."},
+  {id:'hanukkah',name:"Hanukkah",                   emoji:'🕎',countries:['il','us'],                                           level:2,tags:['IL','Gift'],          desc:"Hanukkah gifting — couple and family campaigns work well in IL + US Jewish market."},
+  {id:'xmaseve', name:"Christmas Eve",              emoji:'🎁',countries:['us','gb','fr','au','nz','ca','de','it','es'],        level:2,tags:['Gift','Xmas'],        desc:"Last-minute gifting rush. Digital and fast-delivery products especially strong."},
+  {id:'xmas',    name:"Christmas",                  emoji:'🎄',countries:['us','gb','fr','au','nz','ca','de','it','es'],        level:3,tags:['Gift','Top','Xmas'],  desc:"Biggest gift-buying moment of the year. All-out promotion for every market."},
+  {id:'nye',     name:"New Year's Eve Sale",        emoji:'🥂',countries:['us','gb','fr','au','nz','ca','de','it','es','il'],   level:2,tags:['Sale','NYE'],         desc:"Couples celebration night — last-minute gift and experience promotions."},
 ];
 
-// ── STATE ─────────────────────────────────────────────────────────────────────
-let activeLevels = JSON.parse(localStorage.getItem('hol_lvl') || '[1,2,3]');
-let selectedCtry = null;
+// ── STATE ─────────────────────────────────────────────────
+let levels = JSON.parse(localStorage.getItem('hol_lv') || '[1,2,3]');
+let active = null;
 
 const MON = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 const ABR = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
-function cObj(id){return COUNTRIES.find(c=>c.id===id);}
-function lvlInfo(l){
-  if(l===3)return{icon:'🔥',label:'Printer',cls:'l3'};
-  if(l===2)return{icon:'💰',label:'Potential',cls:'l2'};
-  return{icon:'✅',label:'Decent',cls:'l1'};
-}
-function todayDate(){const t=new Date();return new Date(t.getFullYear(),t.getMonth(),t.getDate());}
-function daysUntil(d){return Math.round((d-todayDate())/86400000);}
+const cObj = id => COUNTRIES.find(c=>c.id===id);
+const li = l => l===3?{icon:'🔥',lbl:'Printer',cls:'l3'}:l===2?{icon:'💰',lbl:'Potential',cls:'l2'}:{icon:'✅',lbl:'Decent',cls:'l1'};
+const todayNorm = () => { const t=new Date(); return new Date(t.getFullYear(),t.getMonth(),t.getDate()); };
+const du = d => Math.round((d - todayNorm()) / 86400000);
 
-// ── INFO ACCORDION ────────────────────────────────────────────────────────────
-function toggleInfo(){
-  const body = document.getElementById('infoBody');
-  const chev = document.getElementById('infoChevron');
-  const open = body.classList.toggle('open');
-  chev.classList.toggle('open', open);
+// ── ACCORDION ─────────────────────────────────────────────
+function toggleAcc(){
+  const b=document.getElementById('accBody'), c=document.getElementById('accChev');
+  const o=b.classList.toggle('open');
+  c.classList.toggle('open',o);
 }
 
-// ── SIDEBAR ───────────────────────────────────────────────────────────────────
+// ── SIDEBAR ───────────────────────────────────────────────
 function renderSidebar(){
   document.getElementById('pinnedList').innerHTML =
-    COUNTRIES.filter(c=>PINNED.includes(c.id)).map(c=>countryBtn(c,true)).join('');
+    COUNTRIES.filter(c=>PINNED.includes(c.id)).map(ctryBtn).join('');
   document.getElementById('otherList').innerHTML =
-    COUNTRIES.filter(c=>!PINNED.includes(c.id)).map(c=>countryBtn(c,false)).join('');
+    COUNTRIES.filter(c=>!PINNED.includes(c.id)).map(ctryBtn).join('');
 }
-function countryBtn(c,pin){
-  const act = selectedCtry===c.id;
-  return `<button class="country-btn${act?' active':''}" onclick="selectCountry('${c.id}')">
-    <span class="country-flag">${c.flag}</span>
-    <span>${c.name}</span>
-    ${pin?'<span class="pin-dot"></span>':''}
+function ctryBtn(c){
+  const on = active===c.id;
+  const pin = PINNED.includes(c.id);
+  return `<button class="ctry-btn${on?' on':''}" onclick="pick('${c.id}')">
+    <span class="ctry-flag">${c.flag}</span>
+    <span class="ctry-name">${c.name}</span>
+    ${pin?'<span class="pin-indicator"></span>':''}
   </button>`;
 }
 
-// ── SELECT COUNTRY ────────────────────────────────────────────────────────────
-function selectCountry(id){
-  selectedCtry = id;
-  localStorage.setItem('hol_last', id);
+// ── PICK COUNTRY ──────────────────────────────────────────
+function pick(id){
+  active=id;
+  localStorage.setItem('hol_last',id);
   renderSidebar();
-  renderHolidays();
-  document.getElementById('emptyState').style.display = 'none';
-  document.getElementById('holidayView').style.display = 'block';
+  render();
+  document.getElementById('emptyState').style.display='none';
+  document.getElementById('hv').style.display='block';
 }
 
-// ── RENDER HOLIDAYS ───────────────────────────────────────────────────────────
-function renderHolidays(){
-  if(!selectedCtry) return;
-  const c = cObj(selectedCtry);
-  document.getElementById('viewTitle').textContent = `${c.flag} ${c.name}`;
-  document.getElementById('viewSub').textContent = 'Discount-worthy holidays — 2026';
+// ── RENDER ────────────────────────────────────────────────
+function render(){
+  if(!active) return;
+  const c = cObj(active);
+  const today = todayNorm();
 
-  const holidays = HOLIDAYS
-    .filter(h => h.countries.includes(selectedCtry) && activeLevels.includes(h.level))
-    .map(h => ({...h, _date: DATES[h.id], _days: daysUntil(DATES[h.id])}))
-    .filter(h => h._date)
-    .sort((a,b) => a._date - b._date);
+  document.getElementById('vhFlag').textContent = c.flag;
+  document.getElementById('vhTitle').textContent = c.name;
 
-  // Upcoming (next 90 days)
-  const upcoming = holidays.filter(h => h._days >= 0 && h._days <= 90);
+  // Filter: country match + level + FUTURE ONLY (>= today)
+  const list = HOLIDAYS
+    .filter(h => h.countries.includes(active) && levels.includes(h.level))
+    .map(h => ({...h, _d: DATES[h.id], _du: du(DATES[h.id])}))
+    .filter(h => h._d && h._d >= today)   // ← FUTURE ONLY
+    .sort((a,b) => a._d - b._d);
+
+  const total = list.length;
+  document.getElementById('vhMeta').textContent =
+    `${total} upcoming holiday${total!==1?'s':''} · 2026`;
+
+  // Upcoming strip (next 90 days)
+  const near = list.filter(h => h._du <= 90);
   let upHtml = '';
-  if(upcoming.length){
-    const cards = upcoming.map(h => {
-      const li = lvlInfo(h.level);
-      const dl = h._days===0 ? 'Today 🚨' : h._days===1 ? 'Tomorrow' : `In ${h._days} days`;
-      return `<div class="upcoming-card ${li.cls}">
-        <div class="uc-emoji">${h.emoji}</div>
-        <div class="uc-days">${dl}</div>
-        <div class="uc-name">${h.name}</div>
-        <div class="uc-date">${h._date.getDate()} ${ABR[h._date.getMonth()]} 2026</div>
-      </div>`;
-    }).join('');
-    upHtml = `<div class="section-label">⚡ Next 90 Days</div><div class="upcoming-strip">${cards}</div>`;
+  if(near.length){
+    upHtml = `<div class="strip-label">⚡ Next 90 Days</div><div class="strip">` +
+      near.map(h => {
+        const l=li(h.level);
+        const label = h._du===0?'Today 🚨':h._du===1?'Tomorrow':`In ${h._du} days`;
+        return `<div class="strip-card ${l.cls}">
+          <div class="sc-emoji">${h.emoji}</div>
+          <div class="sc-countdown">${label}</div>
+          <div class="sc-name">${h.name}</div>
+          <div class="sc-date">${h._d.getDate()} ${ABR[h._d.getMonth()]} 2026</div>
+        </div>`;
+      }).join('') + `</div>`;
   }
 
   // Group by month
-  const monthMap = {};
-  for(const h of holidays){
-    const mi = h._date.getMonth();
-    if(!monthMap[mi]) monthMap[mi] = {label:`${MON[mi]} 2026`, items:[]};
-    monthMap[mi].items.push(h);
+  const byMonth = {};
+  for(const h of list){
+    const mi = h._d.getMonth();
+    if(!byMonth[mi]) byMonth[mi]={lbl:`${MON[mi]} 2026`, items:[]};
+    byMonth[mi].items.push(h);
   }
 
   let monthsHtml = '';
-  if(!holidays.length){
-    monthsHtml = `<div class="no-results">No holidays match the active filters.</div>`;
+  if(!list.length){
+    monthsHtml = `<div class="no-results">No upcoming holidays match your filters.</div>`;
   } else {
-    Object.entries(monthMap).sort((a,b)=>+a[0]-+b[0]).forEach(([,{label,items}])=>{
-      const rows = items.map(h => {
-        const li = lvlInfo(h.level);
-        const tags = h.tags.map(t=>`<span class="tag">${t}</span>`).join('');
-        return `<div class="holiday-row ${li.cls}">
-          <div class="hday-date">
-            <div class="hday-day">${h._date.getDate()}</div>
-            <div class="hday-mon">${ABR[h._date.getMonth()]}</div>
-          </div>
-          <div class="hday-info">
-            <div class="hday-name"><span class="hday-emoji">${h.emoji}</span>${h.name}</div>
-            <div class="hday-desc">${h.desc}</div>
-            <div class="hday-tags">${tags}</div>
-          </div>
-          <div class="level-badge ${li.cls}">
-            <div class="lb-icon">${li.icon}</div>
-            <div class="lb-label">Lvl ${h.level}</div>
-          </div>
-        </div>`;
-      }).join('');
-      monthsHtml += `<div class="month-section">
-        <div class="month-title">${label}<span class="month-badge">${items.length} holiday${items.length!==1?'s':''}</span></div>
-        <div class="holiday-list">${rows}</div>
-      </div>`;
+    Object.entries(byMonth).sort((a,b)=>+a[0]-+b[0]).forEach(([,{lbl,items}])=>{
+      monthsHtml += `<div class="month-grp">
+        <div class="month-hd">${lbl}<span class="m-count">${items.length}</span></div>
+        <div class="h-list">` +
+        items.map(h => {
+          const l=li(h.level);
+          const isToday = h._du===0;
+          const tags = h.tags.map(t=>`<span class="htag">${t}</span>`).join('');
+          return `<div class="h-row ${l.cls}">
+            <div class="h-date">
+              <div class="h-dd">${h._d.getDate()}</div>
+              <div class="h-mm">${ABR[h._d.getMonth()]}</div>
+            </div>
+            <div class="h-body">
+              <div class="h-name">
+                <span class="h-emoji">${h.emoji}</span>
+                ${h.name}
+                ${isToday?'<span class="today-chip">Today</span>':''}
+              </div>
+              <div class="h-desc">${h.desc}</div>
+              <div class="h-tags">${tags}</div>
+            </div>
+            <div class="h-badge ${l.cls}">
+              <div class="hb-icon">${l.icon}</div>
+              <div class="hb-lbl">Lvl ${h.level}</div>
+            </div>
+          </div>`;
+        }).join('') +
+        `</div></div>`;
     });
   }
 
-  document.getElementById('holidayContent').innerHTML = upHtml + monthsHtml;
+  document.getElementById('hvContent').innerHTML = upHtml + monthsHtml;
 }
 
-// ── LEVEL FILTERS ─────────────────────────────────────────────────────────────
-document.querySelectorAll('#levelFilters .pill').forEach(pill => {
-  const lv = parseInt(pill.dataset.level);
-  if(!activeLevels.includes(lv)) pill.classList.remove('active');
-  pill.addEventListener('click', () => {
-    if(activeLevels.includes(lv)){
-      if(activeLevels.length===1) return;
-      activeLevels = activeLevels.filter(l=>l!==lv);
-      pill.classList.remove('active');
+// ── LEVEL PILLS ───────────────────────────────────────────
+document.querySelectorAll('#pills .pill').forEach(p => {
+  const lv = parseInt(p.dataset.lv);
+  if(!levels.includes(lv)) p.classList.remove('on');
+  p.addEventListener('click', () => {
+    if(levels.includes(lv)){
+      if(levels.length===1) return;
+      levels = levels.filter(l=>l!==lv);
+      p.classList.remove('on');
     } else {
-      activeLevels = [...activeLevels, lv];
-      pill.classList.add('active');
+      levels = [...levels, lv];
+      p.classList.add('on');
     }
-    localStorage.setItem('hol_lvl', JSON.stringify(activeLevels));
-    if(selectedCtry) renderHolidays();
+    localStorage.setItem('hol_lv', JSON.stringify(levels));
+    if(active) render();
   });
 });
 
-// ── INIT ──────────────────────────────────────────────────────────────────────
+// ── INIT ──────────────────────────────────────────────────
 renderSidebar();
 const last = localStorage.getItem('hol_last');
-if(last && COUNTRIES.find(c=>c.id===last)){
-  selectCountry(last);
-}
+if(last && COUNTRIES.find(c=>c.id===last)) pick(last);
 </script>
 </body>
 </html>
