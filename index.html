@@ -241,6 +241,32 @@ main { min-height: calc(100vh - var(--header-h)); display: flex; flex-direction:
 
 .no-results { text-align: center; padding: 48px 20px; color: var(--sub); font-size: 14px; }
 
+/* Tips block */
+.tips-block {
+  background: var(--card); border-radius: var(--radius);
+  border: 1px solid var(--border); box-shadow: var(--shadow-sm);
+  padding: 16px 18px; margin-bottom: 28px;
+}
+.tips-title {
+  font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase;
+  color: var(--sub); margin-bottom: 12px; display: flex; align-items: center; gap: 5px;
+}
+.tip-row {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 9px 0; border-top: 1px solid var(--border);
+}
+.tip-row:first-of-type { border-top: none; padding-top: 0; }
+.tip-num {
+  width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; margin-top: 1px;
+}
+.tip-num.l3 { background: var(--l3bg); color: var(--l3); }
+.tip-num.l2 { background: var(--l2bg); color: var(--l2); }
+.tip-num.l1 { background: var(--l1bg); color: var(--l1); }
+.tip-body { flex: 1; font-size: 12.5px; color: var(--text); line-height: 1.5; }
+.tip-body strong { color: var(--text); }
+
 /* Today chip */
 .today-chip {
   display: inline-flex; align-items: center; gap: 5px;
@@ -310,7 +336,7 @@ main { min-height: calc(100vh - var(--header-h)); display: flex; flex-direction:
           <ul class="howto">
             <li>Click any market to load its holidays</li>
             <li>Only future dates shown — no past holidays</li>
-            <li>Next 90 days shown as quick cards at top</li>
+            <li>Next 60 days shown as quick cards at top</li>
             <li>Filter by level using the header buttons</li>
           </ul>
         </div>
@@ -459,6 +485,66 @@ function pick(id){
   document.getElementById('hv').style.display='block';
 }
 
+// ── SMART TIPS ────────────────────────────────────────────
+function buildTips(near, countryName){
+  const tips = [];
+
+  // Sort near by days ascending
+  const sorted = [...near].sort((a,b)=>a._du-b._du);
+
+  // Tip 1: Most urgent / highest priority upcoming holiday
+  const urgent = sorted.find(h=>h.level===3) || sorted.find(h=>h.level===2) || sorted[0];
+  if(urgent){
+    const dLabel = urgent._du===0 ? 'today' : urgent._du===1 ? 'tomorrow' : `in ${urgent._du} days`;
+    const actions = {
+      bf:    'Start teaser campaigns now — audiences need 2–3 weeks of warm-up before the sale goes live.',
+      xmas:  'Push gifting angles hard. Bundle deals and free delivery messaging convert best in this window.',
+      vday:  'Lead with couple connection messaging. "Give them a night they\'ll remember" works extremely well.',
+      mothday:'Frame Connecting™ as the thoughtful gift from a partner, not just a family gift.',
+      pesach: 'Israeli audience is in full family/celebration mode. Connection and togetherness angles are perfect.',
+      rosh:   'New Year energy in Israel — fresh start, invest in your relationship messaging works great.',
+      eofy:   'AU shoppers expect big deals. Lead with your best bundle offer and free delivery.',
+      easter: 'Spring gifting window. Bundle discount + gift-wrapping messaging performs well.',
+      halloween:'Couples-themed playful content — "dare your partner" angle is a natural fit for Connecting™.',
+    };
+    const action = actions[urgent.id] || `Launch your ${urgent.name} campaign at least 7–10 days before the date for best results.`;
+    tips.push({ cls: urgent.level===3?'l3':urgent.level===2?'l2':'l1', text: `<strong>${urgent.emoji} ${urgent.name} is ${dLabel} (${urgent._d.getDate()} ${ABR[urgent._d.getMonth()]}).</strong> ${action}` });
+  }
+
+  // Tip 2: If 2+ holidays in the window, suggest bundling/sequencing
+  if(sorted.length >= 2){
+    const h1 = sorted[0], h2 = sorted[1];
+    const gap = h2._du - h1._du;
+    if(gap <= 14){
+      tips.push({ cls:'l2', text: `<strong>${h1.name} and ${h2.name} are only ${gap} days apart.</strong> Consider running one continuous sale that spans both — momentum keeps converting instead of restarting from zero.` });
+    } else {
+      tips.push({ cls:'l2', text: `<strong>You have ${sorted.length} opportunities in the next 60 days</strong> (${sorted.map(h=>`${h.emoji} ${h.name}`).join(', ')}). Plan each separately with at least a 7-day gap to avoid audience fatigue.` });
+    }
+  } else if(sorted.length===1){
+    tips.push({ cls:'l1', text: `Only one holiday in the next 60 days for ${countryName}. Use the quiet period before it to build your email list and warm up your audience so the campaign lands harder.` });
+  }
+
+  // Tip 3: Prep timing or level-specific advice
+  const hasL3 = sorted.some(h=>h.level===3);
+  const hasL2 = sorted.some(h=>h.level===2);
+  if(hasL3){
+    const l3h = sorted.filter(h=>h.level===3);
+    const earliest = l3h[0];
+    const prepDays = Math.max(0, earliest._du - 10);
+    if(prepDays > 3){
+      tips.push({ cls:'l3', text: `<strong>🔥 Money Printer alert:</strong> You have ${l3h.length} Level 3 holiday${l3h.length>1?'s':''} coming up. Start preparing creative assets now — you want ads ready to go at least 10 days before ${earliest.name} (${earliest._d.getDate()} ${ABR[earliest._d.getMonth()]}).` });
+    } else {
+      tips.push({ cls:'l3', text: `<strong>🔥 ${sorted.find(h=>h.level===3).name} is very close.</strong> If you haven't launched yet, go live immediately — even a last-minute campaign will capture late buyers who are still deciding.` });
+    }
+  } else if(hasL2){
+    tips.push({ cls:'l2', text: `No Level 3 holidays in the next 60 days for ${countryName}, but you have strong Level 2 windows. These are ideal for testing new creatives and offers — lower stakes, real revenue, good learning.` });
+  } else {
+    tips.push({ cls:'l1', text: `Quiet 60 days ahead for ${countryName} — only smaller holidays. Good time to run an evergreen "just because" couples offer with no holiday hook needed. These can outperform seasonal campaigns when competition is low.` });
+  }
+
+  return tips.slice(0,3);
+}
+
 // ── RENDER ────────────────────────────────────────────────
 function render(){
   if(!active) return;
@@ -479,11 +565,11 @@ function render(){
   document.getElementById('vhMeta').textContent =
     `${total} upcoming holiday${total!==1?'s':''} · 2026`;
 
-  // Upcoming strip (next 90 days)
-  const near = list.filter(h => h._du <= 90);
+  // Upcoming strip (next 60 days)
+  const near = list.filter(h => h._du <= 60);
   let upHtml = '';
   if(near.length){
-    upHtml = `<div class="strip-label">⚡ Next 90 Days</div><div class="strip">` +
+    upHtml = `<div class="strip-label">⚡ Next 60 Days</div><div class="strip">` +
       near.map(h => {
         const l=li(h.level);
         const label = h._du===0?'Today 🚨':h._du===1?'Tomorrow':`In ${h._du} days`;
@@ -494,6 +580,18 @@ function render(){
           <div class="sc-date">${h._d.getDate()} ${ABR[h._d.getMonth()]} 2026</div>
         </div>`;
       }).join('') + `</div>`;
+
+    // ── Smart Tips ────────────────────────────────────────
+    const tips = buildTips(near, c.name);
+    if(tips.length){
+      upHtml += `<div class="tips-block">
+        <div class="tips-title">💡 Campaign Tips — Next 60 Days</div>` +
+        tips.map((t,i) => `<div class="tip-row">
+          <div class="tip-num ${t.cls}">${i+1}</div>
+          <div class="tip-body">${t.text}</div>
+        </div>`).join('') +
+      `</div>`;
+    }
   }
 
   // Group by month
