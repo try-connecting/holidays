@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Holiday Planner — Connecting™</title>
+<style>
+  :root {
+    --bg: #f5f5f7;
+    --card: #ffffff;
+    --card2: #f9f9fb;
+    --border: #e0e0e5;
+    --text: #1d1d1f;
+    --sub: #6e6e73;
+    --blue: #0071e3;
+    --blue-light: #e8f1fc;
+    --l1: #34c759; --l1bg: #f0faf3;
+    --l2: #ff9500; --l2bg: #fff7ec;
+    --l3: #ff3b30; --l3bg: #fff2f1;
+    --star: #ffcc00;
+    --radius: 16px;
+    --shadow: 0 2px 16px rgba(0,0,0,.07);
+    --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  /* ── TOP BAR ─────────────────────────────── */
+  header {
+    background: rgba(255,255,255,.82);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; z-index: 100;
+    padding: 14px 24px;
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  }
+  .logo { font-size: 17px; font-weight: 600; letter-spacing: -.3px; display:flex; align-items:center; gap:8px; }
+  .logo span { color: var(--sub); font-weight: 400; }
+  .header-right { display: flex; align-items: center; gap: 12px; }
+  .filter-pills { display: flex; gap: 6px; flex-wrap: wrap; }
+  .pill {
+    padding: 5px 13px; border-radius: 20px; font-size: 13px; font-weight: 500;
+    border: 1.5px solid var(--border); background: var(--card); cursor: pointer;
+    transition: all .15s; color: var(--sub); user-select: none;
+  }
+  .pill.active, .pill:hover { border-color: var(--blue); color: var(--blue); background: var(--blue-light); }
+  .pill.l1.active { border-color: var(--l1); color: var(--l1); background: var(--l1bg); }
+  .pill.l2.active { border-color: var(--l2); color: var(--l2); background: var(--l2bg); }
+  .pill.l3.active { border-color: var(--l3); color: var(--l3); background: var(--l3bg); }
+
+  /* ── LAYOUT ──────────────────────────────── */
+  .layout { display: grid; grid-template-columns: 240px 1fr; gap: 0; min-height: calc(100vh - 57px); }
+
+  /* ── SIDEBAR ─────────────────────────────── */
+  .sidebar {
+    background: var(--card); border-right: 1px solid var(--border);
+    padding: 20px 16px; display: flex; flex-direction: column; gap: 4px;
+    position: sticky; top: 57px; height: calc(100vh - 57px); overflow-y: auto;
+  }
+  .sidebar-label {
+    font-size: 11px; font-weight: 600; letter-spacing: .06em;
+    text-transform: uppercase; color: var(--sub); padding: 10px 8px 4px;
+  }
+  .country-btn {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 9px 10px; border-radius: 10px; cursor: pointer;
+    border: none; background: transparent; width: 100%; text-align: left;
+    font-family: var(--font); font-size: 14px; color: var(--text);
+    transition: background .12s; gap: 8px;
+  }
+  .country-btn:hover { background: var(--bg); }
+  .country-btn.active { background: var(--blue-light); color: var(--blue); font-weight: 500; }
+  .country-left { display: flex; align-items: center; gap: 8px; }
+  .country-flag { font-size: 20px; line-height: 1; }
+  .country-name { font-size: 14px; }
+  .fav-star {
+    font-size: 14px; opacity: .3; cursor: pointer; transition: all .15s;
+    background: none; border: none; padding: 2px; line-height: 1;
+  }
+  .fav-star.active { opacity: 1; }
+  .fav-star:hover { opacity: .7; transform: scale(1.2); }
+  .all-btn {
+    display: flex; align-items: center; gap: 8px;
+    padding: 9px 10px; border-radius: 10px; cursor: pointer;
+    border: none; background: transparent; width: 100%; text-align: left;
+    font-family: var(--font); font-size: 14px; color: var(--text);
+    font-weight: 500; transition: background .12s;
+  }
+  .all-btn:hover { background: var(--bg); }
+  .all-btn.active { background: var(--blue-light); color: var(--blue); }
+
+  /* ── MAIN ────────────────────────────────── */
+  main { padding: 28px 28px 60px; }
+
+  /* ── VIEW HEADER ─────────────────────────── */
+  .view-header {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    margin-bottom: 24px; gap: 16px; flex-wrap: wrap;
+  }
+  .view-title { font-size: 28px; font-weight: 700; letter-spacing: -.5px; line-height: 1.1; }
+  .view-sub { font-size: 15px; color: var(--sub); margin-top: 4px; }
+
+  /* ── UPCOMING STRIP ──────────────────────── */
+  .upcoming-strip {
+    display: flex; gap: 12px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 28px;
+    scrollbar-width: none;
+  }
+  .upcoming-strip::-webkit-scrollbar { display: none; }
+  .upcoming-card {
+    flex: 0 0 auto; background: var(--card); border-radius: 14px;
+    border: 1.5px solid var(--border); padding: 14px 16px; min-width: 160px;
+    cursor: pointer; transition: all .15s; position: relative; overflow: hidden;
+  }
+  .upcoming-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+  .upcoming-card .uc-days { font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--sub); margin-bottom: 4px; }
+  .upcoming-card .uc-name { font-size: 15px; font-weight: 600; line-height: 1.2; margin-bottom: 2px; }
+  .upcoming-card .uc-country { font-size: 12px; color: var(--sub); }
+  .upcoming-card .uc-flag { font-size: 22px; position: absolute; top: 12px; right: 14px; }
+  .upcoming-card.l1 { border-color: var(--l1); background: var(--l1bg); }
+  .upcoming-card.l2 { border-color: var(--l2); background: var(--l2bg); }
+  .upcoming-card.l3 { border-color: var(--l3); background: var(--l3bg); }
+  .upcoming-card.l3 .uc-days { color: var(--l3); }
+  .upcoming-card.l2 .uc-days { color: var(--l2); }
+  .upcoming-card.l1 .uc-days { color: var(--l1); }
+
+  /* ── MONTH SECTIONS ──────────────────────── */
+  .month-section { margin-bottom: 36px; }
+  .month-title {
+    font-size: 20px; font-weight: 700; letter-spacing: -.3px;
+    margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .month-title .month-badge {
+    font-size: 12px; font-weight: 600; background: var(--blue-light);
+    color: var(--blue); padding: 2px 10px; border-radius: 20px;
+  }
+
+  /* ── HOLIDAY ROWS ────────────────────────── */
+  .holiday-list { display: flex; flex-direction: column; gap: 10px; }
+  .holiday-row {
+    background: var(--card); border-radius: var(--radius); padding: 14px 18px;
+    display: flex; align-items: center; gap: 14px;
+    border: 1.5px solid var(--border); transition: all .15s; cursor: default;
+  }
+  .holiday-row:hover { box-shadow: var(--shadow); transform: translateY(-1px); }
+  .holiday-row.l3 { border-left: 4px solid var(--l3); }
+  .holiday-row.l2 { border-left: 4px solid var(--l2); }
+  .holiday-row.l1 { border-left: 4px solid var(--l1); }
+
+  .hday-date {
+    min-width: 48px; text-align: center;
+    font-size: 22px; font-weight: 700; line-height: 1;
+    color: var(--blue);
+  }
+  .hday-date-sub { font-size: 11px; font-weight: 500; color: var(--sub); margin-top: 1px; }
+  .hday-info { flex: 1; }
+  .hday-name { font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+  .hday-emoji { font-size: 18px; }
+  .hday-desc { font-size: 13px; color: var(--sub); margin-top: 2px; }
+  .hday-tags { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
+  .tag {
+    font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 6px;
+    background: var(--bg); color: var(--sub); border: 1px solid var(--border);
+  }
+  .hday-right { display: flex; align-items: center; gap: 10px; }
+
+  .level-badge {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    width: 44px; height: 44px; border-radius: 12px; font-weight: 700;
+  }
+  .level-badge.l1 { background: var(--l1bg); color: var(--l1); }
+  .level-badge.l2 { background: var(--l2bg); color: var(--l2); }
+  .level-badge.l3 { background: var(--l3bg); color: var(--l3); }
+  .level-badge .lb-icon { font-size: 16px; line-height: 1; }
+  .level-badge .lb-label { font-size: 9px; font-weight: 600; letter-spacing: .03em; text-transform: uppercase; margin-top: 1px; }
+
+  .country-flags-row { display: flex; gap: 2px; }
+  .cflag { font-size: 16px; }
+
+  /* ── EMPTY STATE ─────────────────────────── */
+  .empty { text-align: center; padding: 60px 20px; color: var(--sub); }
+  .empty-icon { font-size: 48px; margin-bottom: 12px; }
+  .empty-title { font-size: 18px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+
+  /* ── LEGEND ──────────────────────────────── */
+  .legend {
+    display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 20px;
+    background: var(--card); border-radius: 12px; padding: 12px 16px;
+    border: 1px solid var(--border);
+  }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--sub); }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .legend-dot.l1 { background: var(--l1); }
+  .legend-dot.l2 { background: var(--l2); }
+  .legend-dot.l3 { background: var(--l3); }
+
+  /* ── RESPONSIVE ──────────────────────────── */
+  @media (max-width: 700px) {
+    .layout { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+    main { padding: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">🗓️ Holiday Planner <span>/ Connecting™</span></div>
+  <div class="header-right">
+    <div class="filter-pills" id="levelFilters">
+      <div class="pill l3 active" data-level="3">🔥 Money Printer</div>
+      <div class="pill l2 active" data-level="2">💰 High Potential</div>
+      <div class="pill l1 active" data-level="1">✅ Decent</div>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="sidebar">
+    <div class="sidebar-label">View</div>
+    <button class="all-btn active" id="btn-favorites" onclick="selectCountry('favorites')">⭐ Favorites</button>
+    <button class="all-btn" id="btn-all" onclick="selectCountry('all')">🌍 All Markets</button>
+    <div class="sidebar-label" style="margin-top:8px">Markets</div>
+    <div id="countryList"></div>
+  </nav>
+  <main id="mainContent"></main>
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────────────
+
+const COUNTRIES = [
+  { id: 'il', name: 'Israel',        flag: '🇮🇱', defaultFav: true  },
+  { id: 'us', name: 'United States', flag: '🇺🇸', defaultFav: true  },
+  { id: 'fr', name: 'France',        flag: '🇫🇷', defaultFav: true  },
+  { id: 'gb', name: 'United Kingdom',flag: '🇬🇧', defaultFav: true  },
+  { id: 'au', name: 'Australia',     flag: '🇦🇺', defaultFav: false },
+  { id: 'nz', name: 'New Zealand',   flag: '🇳🇿', defaultFav: false },
+  { id: 'ca', name: 'Canada',        flag: '🇨🇦', defaultFav: false },
+  { id: 'de', name: 'Germany',       flag: '🇩🇪', defaultFav: false },
+  { id: 'it', name: 'Italy',         flag: '🇮🇹', defaultFav: false },
+  { id: 'es', name: 'Spain',         flag: '🇪🇸', defaultFav: false },
+];
+
+// Level 3 = Money Printer 🔥, Level 2 = High Potential 💰, Level 1 = Decent ✅
+// Only discount-worthy holidays included — no religious/solemn days
+const HOLIDAYS = [
+  // ── JANUARY ───────────────────────────────
+  { id:'ny',    name: "New Year's Day",     emoji:'🎆', month:1, day:1,  countries:['us','gb','fr','au','nz','ca','de','it','es'], level:2, tags:['New Year','Sale'],  desc:"New year energy — great for fresh-start messaging and January sales." },
+  { id:'aukd',  name: "Australia Day",      emoji:'🦘', month:1, day:26, countries:['au'],                                         level:2, tags:['National','AU'],    desc:"Big patriotic moment. Couples & gifting campaigns work well." },
+  { id:'vday_es', name: "Día de Reyes",     emoji:'👑', month:1, day:6,  countries:['es'],                                         level:3, tags:['Gift','Top'],       desc:"Bigger than Christmas in Spain. Couples gift-giving peak." },
+
+  // ── FEBRUARY ──────────────────────────────
+  { id:'vday',  name: "Valentine's Day",    emoji:'❤️', month:2, day:14, countries:['us','gb','fr','au','nz','ca','de','it','es','il'], level:3, tags:['Couples','Gift','Top'], desc:"#1 holiday for Connecting™. Couples gift-buying at absolute peak." },
+
+  // ── MARCH ─────────────────────────────────
+  { id:'wwd',   name: "International Women's Day", emoji:'🌸', month:3, day:8,  countries:['us','gb','fr','au','nz','ca','de','it','es','il'], level:2, tags:['Gift','Partner'], desc:"Great for couple gifting and relationship messaging." },
+  { id:'purim', name: "Purim",              emoji:'🎭', month:3, day:13, countries:['il'],                                         level:2, tags:['IL','Fun'],          desc:"Fun, celebratory Israeli holiday. Playful promotions work great." },
+  { id:'mothday_uk', name: "Mother's Day UK", emoji:'🌹', month:3, day:30, countries:['gb'],                                      level:2, tags:['Gift','UK'],         desc:"UK Mothering Sunday — gift season." },
+
+  // ── APRIL ─────────────────────────────────
+  { id:'pesach', name: "Passover / Pesach", emoji:'✡️', month:4, day:13, countries:['il'],                                        level:3, tags:['IL','Top','Family'], desc:"Biggest IL holiday of the year. Family gifting + connection themes are perfect." },
+  { id:'easter', name: "Easter",            emoji:'🐣', month:4, day:20, countries:['us','gb','fr','au','nz','ca','de','it','es'],level:2, tags:['Spring','Gift'],     desc:"Spring gifting — couples and family. Good for bundle promotions." },
+  { id:'anzac',  name: "ANZAC Day",         emoji:'🌺', month:4, day:25, countries:['au','nz'],                                   level:1, tags:['National','AU','NZ'], desc:"Solemn but patriotic. Subtle sale with respectful tone works." },
+
+  // ── MAY ────────────────────────────────────
+  { id:'mothday', name: "Mother's Day",     emoji:'🌷', month:5, day:11, countries:['us','au','nz','ca','de','it','es','il'],     level:3, tags:['Gift','Top','Mom'],  desc:"Top gift holiday worldwide. Huge for Connecting™ gifting campaigns." },
+  { id:'memday',  name: "Memorial Day Sale",emoji:'🇺🇸', month:5, day:26, countries:['us'],                                       level:2, tags:['Sale','US'],         desc:"Major US sale weekend. Good for promotions." },
+
+  // ── JUNE ──────────────────────────────────
+  { id:'fathday', name: "Father's Day",     emoji:'👔', month:6, day:15, countries:['us','ca','gb','de','it','es','il'],          level:2, tags:['Gift','Dad'],        desc:"Father's Day gifting — strong for Connecting™ gift messaging." },
+  { id:'fathday_au', name: "Father's Day AU/NZ", emoji:'👔', month:9, day:7, countries:['au','nz'],                              level:2, tags:['Gift','Dad'],        desc:"AU/NZ Father's Day in September." },
+  { id:'eofy',    name: "EOFY Sale",        emoji:'📊', month:6, day:30, countries:['au'],                                       level:3, tags:['Sale','AU','Top'],   desc:"End of Financial Year — Australia's biggest sale event outside Black Friday." },
+  { id:'summersale_eu', name: "Summer Sale Start (EU Soldes)", emoji:'☀️', month:6, day:25, countries:['fr','de','it','es'],     level:2, tags:['Sale','EU'],        desc:"Official French/EU summer sales season begins — discount-friendly period." },
+
+  // ── JULY ───────────────────────────────────
+  { id:'july4',   name: "4th of July",      emoji:'🎇', month:7, day:4,  countries:['us'],                                       level:2, tags:['US','National','Sale'], desc:"Patriotic US holiday with strong sale culture." },
+  { id:'bastille', name: "Bastille Day",    emoji:'🇫🇷', month:7, day:14, countries:['fr'],                                      level:1, tags:['FR','National'],    desc:"French national day — subtle promotions can work well." },
+
+  // ── AUGUST ────────────────────────────────
+  { id:'summerend', name: "Back to School / Late Summer", emoji:'🎒', month:8, day:15, countries:['us','fr','gb','de','it','es','ca'], level:1, tags:['Sale','Season'],  desc:"Late summer sale push before autumn season." },
+
+  // ── SEPTEMBER ─────────────────────────────
+  { id:'rosh',    name: "Rosh Hashana",     emoji:'🍎', month:9, day:23, countries:['il'],                                       level:3, tags:['IL','Top','Family'], desc:"Jewish New Year — Israel's highest gift-giving and couples moment of the year." },
+  { id:'laborday', name: "Labor Day Sale",  emoji:'🛍️', month:9, day:1,  countries:['us','ca'],                                  level:2, tags:['Sale','US','CA'],   desc:"Major US/CA long weekend sale event." },
+
+  // ── OCTOBER ───────────────────────────────
+  { id:'sukkot',  name: "Sukkot",           emoji:'🌿', month:10, day:13, countries:['il'],                                      level:1, tags:['IL','Family'],      desc:"Israeli holiday — family time, decent for promotions." },
+  { id:'halloween', name: "Halloween",      emoji:'🎃', month:10, day:31, countries:['us','gb','ca','au','nz'],                  level:2, tags:['Fun','Sale'],        desc:"Playful campaigns. Couples-themed Halloween content works well." },
+  { id:'cantha',  name: "Canadian Thanksgiving", emoji:'🍂', month:10, day:13, countries:['ca'],                                level:2, tags:['CA','Gift'],         desc:"Major CA family + gifting holiday." },
+
+  // ── NOVEMBER ──────────────────────────────
+  { id:'bf',      name: "Black Friday",     emoji:'🛒', month:11, day:28, countries:['us','gb','fr','au','nz','ca','de','it','es','il'], level:3, tags:['Sale','Top','BF'], desc:"Biggest global sale event. Maximum promotion — all markets." },
+  { id:'cm',      name: "Cyber Monday",     emoji:'💻', month:12, day:1,  countries:['us','gb','fr','au','nz','ca','de','it','es','il'], level:3, tags:['Sale','Top','BF'], desc:"Follows Black Friday. Strong digital sales moment globally." },
+  { id:'singles', name: "Singles Day (11.11)", emoji:'💔', month:11, day:11, countries:['us','gb','fr','de','it','es'],          level:2, tags:['Sale','Singles'],   desc:"Growing globally as a couples vs. singles playful sale event." },
+  { id:'thanks',  name: "Thanksgiving",     emoji:'🦃', month:11, day:27, countries:['us'],                                      level:2, tags:['US','Gift'],         desc:"Pre-Black Friday US gifting moment." },
+  { id:'thanks_ca', name: "Canadian Thanksgiving", emoji:'🍁', month:10, day:14, countries:['ca'],                              level:2, tags:['CA','Gift'],         desc:"Canadian Thanksgiving — gift season." },
+
+  // ── DECEMBER ──────────────────────────────
+  { id:'hanukkah', name: "Hanukkah",        emoji:'🕎', month:12, day:15, countries:['il','us'],                                 level:2, tags:['IL','Gift'],         desc:"Hanukkah gifting — great for couple & family-focused campaigns." },
+  { id:'xmas',    name: "Christmas",        emoji:'🎄', month:12, day:25, countries:['us','gb','fr','au','nz','ca','de','it','es'], level:3, tags:['Gift','Top','Xmas'], desc:"Year's biggest gift-buying moment. All-out promotion for all markets." },
+  { id:'xmaseve', name: "Christmas Eve Sale", emoji:'🎁', month:12, day:24, countries:['us','gb','fr','au','nz','ca','de','it','es'], level:2, tags:['Gift','Xmas'],  desc:"Last-minute gifting push — digital products especially strong." },
+  { id:'nyd_sale', name: "New Year's Eve Sale", emoji:'🥂', month:12, day:31, countries:['us','gb','fr','au','nz','ca','de','it','es','il'], level:2, tags:['Sale','NYE'], desc:"Couples celebration night — good for last-minute gift promotions." },
+];
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let favorites = JSON.parse(localStorage.getItem('hol_favorites') || 'null') ||
+  COUNTRIES.filter(c => c.defaultFav).map(c => c.id);
+let selectedCountry = localStorage.getItem('hol_selected') || 'favorites';
+let activeLevels = JSON.parse(localStorage.getItem('hol_levels') || '[1,2,3]');
+
+function save() {
+  localStorage.setItem('hol_favorites', JSON.stringify(favorites));
+  localStorage.setItem('hol_selected', selectedCountry);
+  localStorage.setItem('hol_levels', JSON.stringify(activeLevels));
+}
+
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const dayAbbr = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+function today() { return new Date(); }
+
+function holidayDate(h, year) {
+  return new Date(year, h.month - 1, h.day);
+}
+
+function daysUntil(h) {
+  const t = today();
+  const now = new Date(t.getFullYear(), t.getMonth(), t.getDate());
+  let d = holidayDate(h, t.getFullYear());
+  if (d < now) d = holidayDate(h, t.getFullYear() + 1);
+  return Math.round((d - now) / 86400000);
+}
+
+function countryObj(id) { return COUNTRIES.find(c => c.id === id); }
+
+function levelInfo(l) {
+  if (l === 3) return { icon: '🔥', label: 'Printer',  cls: 'l3' };
+  if (l === 2) return { icon: '💰', label: 'Potential', cls: 'l2' };
+  return              { icon: '✅', label: 'Decent',    cls: 'l1' };
+}
+
+function getVisibleCountries() {
+  if (selectedCountry === 'favorites') return favorites;
+  if (selectedCountry === 'all') return COUNTRIES.map(c => c.id);
+  return [selectedCountry];
+}
+
+function filterHolidays(allH) {
+  const countries = getVisibleCountries();
+  return allH.filter(h =>
+    activeLevels.includes(h.level) &&
+    h.countries.some(c => countries.includes(c))
+  );
+}
+
+function enrichHoliday(h) {
+  const countries = getVisibleCountries();
+  const matchingCountries = h.countries.filter(c => countries.includes(c));
+  return { ...h, matchingCountries, daysUntil: daysUntil(h) };
+}
+
+// ── RENDER SIDEBAR ────────────────────────────────────────────────────────────
+function renderSidebar() {
+  const list = document.getElementById('countryList');
+  list.innerHTML = '';
+  COUNTRIES.forEach(c => {
+    const isFav = favorites.includes(c.id);
+    const isActive = selectedCountry === c.id;
+    const btn = document.createElement('button');
+    btn.className = 'country-btn' + (isActive ? ' active' : '');
+    btn.innerHTML = `
+      <div class="country-left">
+        <span class="country-flag">${c.flag}</span>
+        <span class="country-name">${c.name}</span>
+      </div>
+      <button class="fav-star ${isFav ? 'active' : ''}" title="${isFav ? 'Remove from favorites' : 'Add to favorites'}" onclick="toggleFav(event,'${c.id}')">⭐</button>
+    `;
+    btn.addEventListener('click', (e) => { if (!e.target.classList.contains('fav-star')) selectCountry(c.id); });
+    list.appendChild(btn);
+  });
+  document.getElementById('btn-favorites').className = 'all-btn' + (selectedCountry === 'favorites' ? ' active' : '');
+  document.getElementById('btn-all').className = 'all-btn' + (selectedCountry === 'all' ? ' active' : '');
+}
+
+// ── RENDER MAIN ───────────────────────────────────────────────────────────────
+function renderMain() {
+  const main = document.getElementById('mainContent');
+  const t = today();
+
+  // Get country label
+  let viewTitle = '⭐ Favorite Markets';
+  let viewSub = `Showing holidays across ${favorites.length} favorite market${favorites.length !== 1 ? 's' : ''}`;
+  if (selectedCountry !== 'favorites' && selectedCountry !== 'all') {
+    const c = countryObj(selectedCountry);
+    viewTitle = `${c.flag} ${c.name}`;
+    viewSub = 'Discount-worthy holidays for this market';
+  } else if (selectedCountry === 'all') {
+    viewTitle = '🌍 All Markets';
+    viewSub = 'Every discount-worthy holiday across all markets';
+  }
+
+  // Get upcoming (next 90 days)
+  const allH = HOLIDAYS.map(enrichHoliday).filter(h => filterHolidays([h]).length > 0);
+  const upcoming = allH.filter(h => h.daysUntil >= 0 && h.daysUntil <= 90)
+    .sort((a,b) => a.daysUntil - b.daysUntil).slice(0, 10);
+
+  // Group by month (current year + next year if needed)
+  const monthMap = {};
+  allH.forEach(h => {
+    const now = new Date(t.getFullYear(), t.getMonth(), t.getDate());
+    let d = holidayDate(h, t.getFullYear());
+    if (d < now) d = holidayDate(h, t.getFullYear() + 1);
+    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    const label = `${monthNames[d.getMonth()]} ${d.getFullYear()}`;
+    if (!monthMap[key]) monthMap[key] = { label, holidays: [] };
+    monthMap[key].holidays.push({ ...h, _date: d });
+  });
+
+  const sortedMonths = Object.entries(monthMap).sort((a,b) => a[0].localeCompare(b[0]));
+
+  // Legend
+  const legendHtml = `
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot l3"></div><strong>Level 3 — Money Printer 🔥</strong> Must-have, huge potential, go all-out</div>
+      <div class="legend-item"><div class="legend-dot l2"></div><strong>Level 2 — High Potential 💰</strong> Strong holiday, worth a solid campaign</div>
+      <div class="legend-item"><div class="legend-dot l1"></div><strong>Level 1 — Decent ✅</strong> Worth a banner or small promo</div>
+    </div>`;
+
+  // Upcoming strip
+  let upcomingHtml = '';
+  if (upcoming.length) {
+    upcomingHtml = `<div class="upcoming-strip">` + upcoming.map(h => {
+      const li = levelInfo(h.level);
+      const flags = h.matchingCountries.map(id => countryObj(id)?.flag || '').join('');
+      const dLabel = h.daysUntil === 0 ? 'Today!' : h.daysUntil === 1 ? 'Tomorrow' : `In ${h.daysUntil} days`;
+      return `<div class="upcoming-card ${li.cls}">
+        <div class="uc-flag">${h.emoji}</div>
+        <div class="uc-days">${dLabel}</div>
+        <div class="uc-name">${h.name}</div>
+        <div class="uc-country">${flags}</div>
+      </div>`;
+    }).join('') + `</div>`;
+  }
+
+  // Month sections
+  let monthsHtml = '';
+  if (sortedMonths.length === 0) {
+    monthsHtml = `<div class="empty"><div class="empty-icon">🔍</div><div class="empty-title">No holidays match your filters</div><div>Try enabling more levels above</div></div>`;
+  } else {
+    sortedMonths.forEach(([key, {label, holidays}]) => {
+      const sorted = holidays.sort((a,b) => a._date - b._date);
+      const rows = sorted.map(h => {
+        const li = levelInfo(h.level);
+        const flags = h.matchingCountries.map(id => countryObj(id)?.flag || '').join('');
+        const tags = h.tags.map(t => `<span class="tag">${t}</span>`).join('');
+        return `<div class="holiday-row ${li.cls}">
+          <div class="hday-date">
+            ${h._date.getDate()}
+            <div class="hday-date-sub">${dayAbbr[h._date.getMonth()]}</div>
+          </div>
+          <div class="hday-info">
+            <div class="hday-name"><span class="hday-emoji">${h.emoji}</span>${h.name}</div>
+            <div class="hday-desc">${h.desc}</div>
+            <div class="hday-tags">${tags}</div>
+          </div>
+          <div class="hday-right">
+            <div class="country-flags-row">${h.matchingCountries.map(id => `<span class="cflag">${countryObj(id)?.flag||''}</span>`).join('')}</div>
+            <div class="level-badge ${li.cls}">
+              <div class="lb-icon">${li.icon}</div>
+              <div class="lb-label">Lvl ${h.level}</div>
+            </div>
+          </div>
+        </div>`;
+      }).join('');
+
+      monthsHtml += `<div class="month-section">
+        <div class="month-title">${label} <span class="month-badge">${sorted.length} holiday${sorted.length !== 1 ? 's' : ''}</span></div>
+        <div class="holiday-list">${rows}</div>
+      </div>`;
+    });
+  }
+
+  main.innerHTML = `
+    <div class="view-header">
+      <div>
+        <div class="view-title">${viewTitle}</div>
+        <div class="view-sub">${viewSub}</div>
+      </div>
+    </div>
+    ${legendHtml}
+    ${upcoming.length ? `<div style="font-size:13px;font-weight:600;color:var(--sub);letter-spacing:.04em;text-transform:uppercase;margin-bottom:10px">⚡ Upcoming — Next 90 Days</div>${upcomingHtml}` : ''}
+    ${monthsHtml}
+  `;
+}
+
+// ── ACTIONS ───────────────────────────────────────────────────────────────────
+function selectCountry(id) {
+  selectedCountry = id;
+  save();
+  renderSidebar();
+  renderMain();
+}
+
+function toggleFav(e, id) {
+  e.stopPropagation();
+  if (favorites.includes(id)) {
+    favorites = favorites.filter(f => f !== id);
+  } else {
+    favorites.push(id);
+  }
+  save();
+  renderSidebar();
+  if (selectedCountry === 'favorites') renderMain();
+}
+
+// Level filter pills
+document.querySelectorAll('#levelFilters .pill').forEach(pill => {
+  const level = parseInt(pill.dataset.level);
+  if (!activeLevels.includes(level)) pill.classList.remove('active');
+  pill.addEventListener('click', () => {
+    if (activeLevels.includes(level)) {
+      if (activeLevels.length === 1) return; // keep at least one
+      activeLevels = activeLevels.filter(l => l !== level);
+      pill.classList.remove('active');
+    } else {
+      activeLevels.push(level);
+      pill.classList.add('active');
+    }
+    save();
+    renderMain();
+  });
+});
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+renderSidebar();
+renderMain();
+</script>
+</body>
+</html>
