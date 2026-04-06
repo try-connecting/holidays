@@ -496,6 +496,7 @@ function showHolidays(){
 // ── SELECT COUNTRY ────────────────────────────────────────────────────────────
 function selectCountry(id){
   selectedCtry=id;
+  localStorage.setItem('hol_last',id);
   renderSidebar();
   renderHolidays();
   showHolidays();
@@ -599,12 +600,7 @@ if(last && COUNTRIES.find(c=>c.id===last)){
   showWelcome();
 }
 
-// persist selection
-const _orig = selectCountry;
-window.selectCountry = function(id){
-  localStorage.setItem('hol_last',id);
-  _orig(id);
-};
+
 </script>
 </body>
 </html>
